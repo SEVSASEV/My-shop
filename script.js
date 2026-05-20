@@ -1,3 +1,9 @@
+// ==========================================
+// НАСТРОЙКА FORMSPREE
+// Ваша рабочая ссылка для отправки писем
+const FORMSPREE_URL = "https://formspree.io/f/mrededyy"; 
+// ==========================================
+
 document.addEventListener('DOMContentLoaded', () => {
     let cart = [];
     
@@ -10,9 +16,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const totalSumEl = document.getElementById('total-sum');
     const orderForm = document.getElementById('shop-form');
     const submitBtn = document.getElementById('submit-btn');
-    
-    const hiddenProducts = document.getElementById('hidden-products');
-    const hiddenTotal = document.getElementById('hidden-total');
+    const progressContainer = document.querySelector('.progress-container');
+    const progressBar = document.getElementById('order-progress');
     
     const historyEmpty = document.getElementById('history-empty');
     const historyList = document.getElementById('history-list');
@@ -20,7 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     renderHistory();
 
-    // 1. Добавление товара в корзину
+    // 1. Добавление товара в корзину из HTML таблицы
     buyButtons.forEach(button => {
         button.addEventListener('click', () => {
             const name = button.getAttribute('data-product');
@@ -73,7 +78,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const li = document.createElement('li');
             li.className = 'cart-item';
             li.innerHTML = `
-                <div><strong>${item.name}</strong> — ${item.price} руб. x ${item.quantity}</div>
+                <div>
+                    <strong>${item.name}</strong> — ${item.price} руб. x ${item.quantity}
+                </div>
                 <div class="cart-item-actions">
                     <button type="button" class="quantity-btn minus" data-index="${index}">-</button>
                     <button type="button" class="quantity-btn plus" data-index="${index}">+</button>
@@ -85,11 +92,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         totalSumEl.textContent = totalSum.toLocaleString('ru-RU');
 
-        // Записываем данные в скрытые поля HTML-формы для отправки на почту
-        if(hiddenProducts) hiddenProducts.value = cart.map(item => `${item.name} (${item.quantity} шт.)`).join(', ');
-        if(hiddenTotal) hiddenTotal.value = totalSum + " руб.";
-
-        // Кнопки внутри корзины
+        // Кнопки "+" / "-" / "Удалить" внутри корзины
         cartItemsList.querySelectorAll('.plus').forEach(btn => btn.addEventListener('click', (e) => {
             cart[e.target.getAttribute('data-index')].quantity += 1;
             updateCartUI();
@@ -111,30 +114,76 @@ document.addEventListener('DOMContentLoaded', () => {
         }));
     }
 
-    // 3. Сохранение в локальную историю при клике на отправку формы
+    // 3. Исправленная отправка заказа через Fetch API на правильный URL
     if (orderForm) {
-        orderForm.addEventListener('submit', () => {
-            const totalSum = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-            const orderProductsText = cart.map(item => `${item.name} (${item.quantity}шт.)`).join(', ');
+        orderForm.addEventListener('submit', (e) => {
+            e.preventDefault(); // Защита от стандартной перезагрузки страницы
 
-            const newOrder = {
-                id: Math.floor(Math.random() * 100000),
-                date: new Date().toLocaleString('ru-RU'),
-                products: orderProductsText,
-                totalPrice: totalSum
+            const clientName = document.getElementById('name').value.trim();
+            const clientEmail = document.getElementById('email').value.trim();
+            const clientComment = document.getElementById('comment').value.trim();
+            
+            const totalSum = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            const orderProductsText = cart.map(item => `${item.name} (${item.quantity} шт.)`).join(', ');
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = "Отправка...";
+
+            // Собираем данные в правильный формат для Formspree
+            const formData = {
+                "Имя клиента": clientName,
+                "Email для связи": clientEmail,
+                "Состав заказа": orderProductsText,
+                "Итоговая сумма": totalSum + " руб.",
+                "Адрес и комментарий": clientComment
             };
 
-            let history = JSON.parse(localStorage.getItem('shop_history')) || [];
-            history.unshift(newOrder);
-            localStorage.setItem('shop_history', JSON.stringify(history));
-            
-            // Корзина очистится автоматически после перезагрузки формы сервисом Formspree
+            // Отправляем запрос на правильный URL из переменной FORMSPREE_URL
+            fetch(FORMSPREE_URL, {
+                method: 'POST',
+                body: JSON.stringify(formData),
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                if (response.ok) {
+                    finalizeOrder(clientName, orderProductsText, totalSum);
+                } else {
+                    throw new Error('Ошибка сервера');
+                }
+            })
+            .catch(() => {
+                alert("Произошла ошибка при отправке. Заказ сохранен в историю локально.");
+                finalizeOrder(clientName, orderProductsText, totalSum);
+            });
         });
     }
 
+    function finalizeOrder(name, productsText, total) {
+        const newOrder = {
+            id: Math.floor(Math.random() * 100000),
+            date: new Date().toLocaleString('ru-RU'),
+            products: productsText,
+            totalPrice: total
+        };
+
+        let history = JSON.parse(localStorage.getItem('shop_history')) || [];
+        history.unshift(newOrder);
+        localStorage.setItem('shop_history', JSON.stringify(history));
+
+        alert(`Успешно!\n\nЗаказ оформлен.\nДанные отправлены на почту администратора.`);
+        
+        cart = [];
+        updateCartUI();
+        orderForm.reset();
+    }
+
+    // 4. Отрисовка истории
     function renderHistory() {
         const history = JSON.parse(localStorage.getItem('shop_history')) || [];
-        if (!historyList) return;
+
         if (history.length === 0) {
             historyEmpty.style.display = 'block';
             historyList.innerHTML = '';
@@ -150,20 +199,23 @@ document.addEventListener('DOMContentLoaded', () => {
             const card = document.createElement('div');
             card.className = 'history-card';
             card.innerHTML = `
-                <div class="history-header"><span>Заказ №${order.id}</span><span>${order.date}</span></div>
+                <div class="history-header">
+                    <span>Заказ №${order.id}</span>
+                    <span>${order.date}</span>
+                </div>
                 <div><strong>Товары:</strong> ${order.products}</div>
-                <div style="margin-top: 0.5rem; text-align: right; font-weight: bold; color: #2ecc71;">Сумма: ${order.totalPrice.toLocaleString('ru-RU')} руб.</div>
+                <div style="margin-top: 0.5rem; text-align: right; font-weight: bold; color: #2ecc71;">
+                    Сумма: ${order.totalPrice.toLocaleString('ru-RU')} руб.
+                </div>
             `;
             historyList.appendChild(card);
         });
     }
 
-    if (clearHistoryBtn) {
-        clearHistoryBtn.addEventListener('click', () => {
-            if(confirm("Очистить историю?")) {
-                localStorage.removeItem('shop_history');
-                renderHistory();
-            }
-        });
-    }
+    clearHistoryBtn.addEventListener('click', () => {
+        if(confirm("Вы уверены, что хотите очистить всю историю заказов?")) {
+            localStorage.removeItem('shop_history');
+            renderHistory();
+        }
+    });
 });
