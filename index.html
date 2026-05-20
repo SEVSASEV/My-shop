@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Premium Store — Полная версия</title>
+    <title>Premium Store</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -22,6 +22,7 @@
     </header>
 
     <main class="container main-content">
+        <!-- Каталог, поиск и фильтры -->
         <section id="catalog-section">
             <h2>Каталог товаров</h2>
             <div class="highlight-block">🔥 Мега-акция! Промокод <span style="text-decoration: underline;">SALE10</span> дает скидку 10%! 🔥</div>
@@ -37,14 +38,13 @@
                     <option value="games">Видеоигры</option>
                     <option value="toys">Игрушки и хобби</option>
                 </select>
-
             </div>
 
-            <div class="products-grid" id="products-grid">
-                <!-- Карточки генерируются через JS -->
-            </div>
+            <!-- Сетка карточек товаров (Сюда JS вставляет товары) -->
+            <div class="products-grid" id="products-grid"></div>
         </section>
 
+        <!-- Корзина -->
         <section id="cart-section">
             <h2>Ваша корзина</h2>
             <div id="cart-empty-message">Корзина пуста. Добавьте товары из каталога выше!</div>
@@ -62,6 +62,7 @@
             </div>
         </section>
 
+        <!-- Оформление заказа -->
         <section id="order-section">
             <h2>Оформление заказа</h2>
             <div class="progress-container" style="display: none; margin-bottom: 1.5rem;">
@@ -83,6 +84,7 @@
             </form>
         </section>
 
+        <!-- История заказов -->
         <section id="history-section">
             <h2>История ваших заказов</h2>
             <div id="history-empty">Вы еще не совершали покупок.</div>
@@ -91,7 +93,11 @@
         </section>
     </main>
 
-        <!-- ВСПЛЫВАЮЩЕЕ МОДАЛЬНОЕ ОКНО ДЛЯ ИНФОРМАЦИИ О ТОВАРЕ -->
+    <footer class="footer">
+        <p>&copy; 2026 Все права не защищены. <a href="#" class="external-link">Обращаться к Арчилаеву Б.</a></p>
+    </footer>
+
+    <!-- Модальное окно для подробной информации -->
     <div id="product-modal" class="modal-overlay" style="display: none;">
         <div class="modal-content">
             <span id="modal-close" class="modal-close-btn">&times;</span>
@@ -104,15 +110,14 @@
                     <p id="modal-desc" class="modal-description">Описание товара...</p>
                     
                     <h4 style="margin-top: 1rem; color: #2c3e50;">Характеристики:</h4>
-                    <ul id="modal-specs-list" class="modal-specs">
-                        <!-- Заполняется из JS -->
-                    </ul>
+                    <ul id="modal-specs-list" class="modal-specs"></ul>
                     
                     <button type="button" id="modal-buy-btn" class="buy-button" style="margin-top: 1.5rem; padding: 0.8rem;">Добавить в корзину</button>
                 </div>
             </div>
         </div>
     </div>
-<script src="script.js"></script>
+
+    <script src="script.js"></script>
 </body>
 </html>
