@@ -1,7 +1,7 @@
 // ==========================================
 // НАСТРОЙКА FORMSPREE
 // Вставьте сюда вашу скопированную ссылку вместо заглушки:
-const FORMSPREE_URL = "https://formspree.io/f/mrededyy"; 
+const FORMSPREE_URL = "https://formspree.io/f/mrededdyy"; 
 // ==========================================
 
 // 1. Ваши базовые товары (12 шт)
@@ -9,7 +9,7 @@ const BASE_PRODUCTS = [
     { id: 1, name: "Наушники", price: 3000, category: "gadgets", img: "img/headphones.jpg", description: "Полноразмерные беспроводные наушники с глубоким басом.", specs: { "Время работы": "до 40 часов", "Цвет": "Черный" } },
     { id: 2, name: "Подписка Telegram Premium", price: 2000, category: "services", img: "img/tg.jpg", description: "Официальная подписка на 12 месяцев.", specs: { "Срок действия": "12 месяцев", "Тип": "Gift" } },
     { id: 3, name: "Чайник", price: 1500, category: "appliances", img: "img/kettle.jpg", description: "Стильный электрический чайник из стали.", specs: { "Объем": "1.7 л", "Мощность": "2200 Вт" } },
-    { id: 4, name: "iPhone 15 Pro Max Super", price: 45000, category: "gadgets", img: "img/iphone.jpg", description: "Флагманский смартфон в титановом корпусе.", specs: { "Экран": "6.7 дюйма", "Память": "256 ГБ" } },
+    { id: 4, name: "iPhone 15 Pro Max Super", price: 45000, category: "gadgets", img: "img/iphone.jpg", description: "Флагманский smartphone в титановом корпусе.", specs: { "Экран": "6.7 дюйма", "Память": "256 ГБ" } },
     { id: 5, name: "Умные часы Sport Watch", price: 5500, category: "gadgets", img: "img/watch.jpg", description: "Современные смарт-часы с AMOLED-экраном.", specs: { "Экран": "1.43 дюйма", "Автономность": "14 дней" } },
     { id: 6, name: "Робот-пылесос CleanBot", price: 14000, category: "appliances", img: "img/vacuum.jpg", description: "Робот-пылесос для сухой и влажной уборки.", specs: { "Мощность": "4000 Па", "Навигация": "LiDAR" } },
     { id: 7, name: "Капсульная кофемашина", price: 8900, category: "appliances", img: "img/coffee.jpg", description: "Компактная кофемашина для быстрого эспрессо.", specs: { "Давление": "19 бар", "Объем": "0.8 л" } },
@@ -35,7 +35,7 @@ const generateExtraProducts = () => {
     const toyTypes = ["Конструктор Блоки", "Плюшевый мишка", "Радиоуправляемая машина", "Настольная игра", "Коллекционная фигурка", "Пазл Сложный", "Развивающий набор"];
     const materials = ["Гипоаллергенный пластик", "Эко-дерево", "Мягкий плюш", "Плотный картон"];
 
-    // Функция генерации графики в коде браузера
+    // Функция генерации графики внутри браузера
     const createPlaceholderSvg = (text, bgColor) => {
         const svg = `<svg xmlns="http://w3.org" width="400" height="300" viewBox="0 0 400 300">
             <rect width="100%" height="100%" fill="${bgColor}"/>
@@ -130,11 +130,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const modalSpecsList = document.getElementById('modal-specs-list');
     const modalBuyBtn = document.getElementById('modal-buy-btn');
 
-    // Инициализация
+    // Инициализация сайта
     renderProducts(PRODUCTS_DATABASE);
     renderHistory();
 
-    // 3. Отрисовка каталога
+    // 3. Функция отрисовки каталога
     function renderProducts(products) {
         if (!productsGrid) return;
         productsGrid.innerHTML = '';
@@ -146,7 +146,7 @@ document.addEventListener('DOMContentLoaded', () => {
         products.forEach((prod, index) => {
             const card = document.createElement('div');
             card.className = 'product-card animate-card';
-            card.style.setProperty('--delay', index % 10); // Ограничиваем задержку для скорости
+            card.style.setProperty('--delay', index % 10);
             
             card.innerHTML = `
                 <img src="${prod.img}" alt="${prod.name}" class="view-details-trigger" data-id="${prod.id}" style="cursor:pointer;">
@@ -162,9 +162,9 @@ document.addEventListener('DOMContentLoaded', () => {
             productsGrid.appendChild(card);
         });
 
-        // Навешивание событий на новые кнопки
+        // События на кнопки добавления
         productsGrid.querySelectorAll('.buy-button').forEach(btn => {
-            btn.addEventListener('click', (e) => {
+            btn.addEventListener('click', () => {
                 const pId = parseInt(btn.getAttribute('data-id'));
                 const product = PRODUCTS_DATABASE.find(p => p.id === pId);
                 addToCart(product);
@@ -175,6 +175,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
 
+        // Открытие модалки
         productsGrid.querySelectorAll('.view-details-trigger, .details-button').forEach(el => {
             el.addEventListener('click', () => {
                 const pId = parseInt(el.getAttribute('data-id'));
@@ -402,11 +403,11 @@ document.addEventListener('DOMContentLoaded', () => {
         isDiscountApplied = false;
         updateCartUI();
         orderForm.reset();
-        progressContainer.style.display = 'none';
+        progressContainer.style.none = 'none';
         renderHistory();
     }
 
-    // 8. История
+    // 8. История заказов
     function renderHistory() {
         if (!historyList) return;
         const history = JSON.parse(localStorage.getItem('shop_history')) || [];
