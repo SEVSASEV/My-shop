@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Мой интернет-магазин</title>
+    <title>Мой internet-магазин</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -22,7 +22,7 @@
     </header>
 
     <main class="container main-content">
-        <!-- Каталог товаров -->
+        <!-- Секция каталога -->
         <section id="catalog">
             <h2>Наши лучшие товары</h2>
             <div class="highlight-block">🔥 Мега-акция! Скидки до 67%! 🔥</div>
@@ -77,19 +77,19 @@
             </div>
         </section>
 
-        <!-- Оформление заказа (Прямая отправка формы через HTML) -->
+        <!-- Оформление заказа -->
         <section id="order-section">
             <h2>Оформление заказа</h2>
             
-            <!-- ВНИМАНИЕ: ВСТАВЬТЕ СВОЮ ССЫЛКУ FORMSPREE В ACTION -->
-            <form class="order-form" id="shop-form" action="ВСТАВЬТЕ_СЮДА_ВАШУ_ССЫЛКУ_FORMSPREE" method="POST">
+            <!-- СТРОКА ИСПРАВЛЕНА: Русский текст убран, вставлен тестовый обработчик форм -->
+            <form class="order-form" id="shop-form" action="https://formspree.io/f/mrededyy" method="POST">
                 <label for="name">Ваше имя:</label>
                 <input type="text" id="name" name="Имя клиента" class="name-input" placeholder="Иван" required>
 
                 <label for="email">Ваш Email (для копии чека):</label>
                 <input type="email" id="email" name="Email для связи" class="name-input" placeholder="example@mail.ru" required>
 
-                <!-- Скрытое поле, куда JS автоматически запишет состав корзины -->
+                <!-- Скрытые технические поля для передачи состава заказа -->
                 <input type="hidden" id="hidden-products" name="Состав заказа">
                 <input type="hidden" id="hidden-total" name="Итоговая сумма">
 
