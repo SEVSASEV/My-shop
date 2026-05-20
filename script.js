@@ -1,9 +1,3 @@
-// ==========================================
-// НАСТРОЙКА TELEGRAM БОТА
-const TG_BOT_TOKEN = "8701859414:AAEPSK4tgRxgZ9YCGdnQOfjR9whuQFfpyJM"; 
-const TG_CHAT_ID = "2084519118"; 
-// ==========================================
-
 document.addEventListener('DOMContentLoaded', () => {
     let cart = [];
     
@@ -16,8 +10,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const totalSumEl = document.getElementById('total-sum');
     const orderForm = document.getElementById('shop-form');
     const submitBtn = document.getElementById('submit-btn');
-    const progressContainer = document.querySelector('.progress-container');
-    const progressBar = document.getElementById('order-progress');
+    
+    const hiddenProducts = document.getElementById('hidden-products');
+    const hiddenTotal = document.getElementById('hidden-total');
     
     const historyEmpty = document.getElementById('history-empty');
     const historyList = document.getElementById('history-list');
@@ -25,7 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     renderHistory();
 
-    // 1. Добавление товара в корзину из HTML таблицы
+    // 1. Добавление товара в корзину
     buyButtons.forEach(button => {
         button.addEventListener('click', () => {
             const name = button.getAttribute('data-product');
@@ -78,9 +73,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const li = document.createElement('li');
             li.className = 'cart-item';
             li.innerHTML = `
-                <div>
-                    <strong>${item.name}</strong> — ${item.price} руб. x ${item.quantity}
-                </div>
+                <div><strong>${item.name}</strong> — ${item.price} руб. x ${item.quantity}</div>
                 <div class="cart-item-actions">
                     <button type="button" class="quantity-btn minus" data-index="${index}">-</button>
                     <button type="button" class="quantity-btn plus" data-index="${index}">+</button>
@@ -92,6 +85,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         totalSumEl.textContent = totalSum.toLocaleString('ru-RU');
 
+        // Записываем данные в скрытые поля HTML-формы для отправки на почту
+        if(hiddenProducts) hiddenProducts.value = cart.map(item => `${item.name} (${item.quantity} шт.)`).join(', ');
+        if(hiddenTotal) hiddenTotal.value = totalSum + " руб.";
+
+        // Кнопки внутри корзины
         cartItemsList.querySelectorAll('.plus').forEach(btn => btn.addEventListener('click', (e) => {
             cart[e.target.getAttribute('data-index')].quantity += 1;
             updateCartUI();
@@ -113,86 +111,30 @@ document.addEventListener('DOMContentLoaded', () => {
         }));
     }
 
-    // 3. Отправка заказа НАПРЯМУЮ в Telegram
-    orderForm.addEventListener('submit', (e) => {
-        e.preventDefault();
+    // 3. Сохранение в локальную историю при клике на отправку формы
+    if (orderForm) {
+        orderForm.addEventListener('submit', () => {
+            const totalSum = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            const orderProductsText = cart.map(item => `${item.name} (${item.quantity}шт.)`).join(', ');
 
-        const clientName = document.getElementById('name').value.trim();
-        const clientEmail = document.getElementById('email').value.trim();
-        const clientComment = document.getElementById('comment').value.trim();
-        
-        const totalSum = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-        
-        // Красиво форматируем текст сообщения для Telegram
-        let messageText = `🛍 *НОВЫЙ ЗАКАЗ НА САЙТЕ!*\n\n`;
-        messageText += `👤 *Клиент:* ${clientName}\n`;
-        messageText += `📧 *Email:* ${clientEmail}\n`;
-        messageText += `🏠 *Адрес/Комментарий:* ${clientComment}\n\n`;
-        messageText += `📦 *Товары:* \n`;
-        
-        cart.forEach(item => {
-            messageText += `• ${item.name} (${item.quantity} шт.) — ${item.price * item.quantity} руб.\n`;
+            const newOrder = {
+                id: Math.floor(Math.random() * 100000),
+                date: new Date().toLocaleString('ru-RU'),
+                products: orderProductsText,
+                totalPrice: totalSum
+            };
+
+            let history = JSON.parse(localStorage.getItem('shop_history')) || [];
+            history.unshift(newOrder);
+            localStorage.setItem('shop_history', JSON.stringify(history));
+            
+            // Корзина очистится автоматически после перезагрузки формы сервисом Formspree
         });
-        
-        messageText += `\n💰 *Итого к оплате:* ${totalSum} руб.`;
-
-        submitBtn.disabled = true;
-        progressContainer.style.display = 'block';
-        progressBar.value = 50;
-
-       // ЗАМЕНИТЕ НА ЭТУ (она отправляет запросы в обход блокировок):
-const url = `https://telegram.org.ru{TG_BOT_TOKEN}/sendMessage`;
-
-        // Отправка данных методом POST
-        fetch(url, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                chat_id: TG_CHAT_ID,
-                text: messageText,
-                parse_mode: "Markdown" // Позволяет делать текст жирным
-            })
-        })
-        .then(response => {
-            if (response.ok) {
-                progressBar.value = 100;
-                finalizeOrder(clientName, cart.map(item => `${item.name} (${item.quantity}шт.)`).join(', '), totalSum);
-            } else {
-                throw new Error();
-            }
-        })
-        .catch(() => {
-            alert("Ошибка связи с ботом. Заказ сохранен только локально.");
-            finalizeOrder(clientName, cart.map(item => `${item.name} (${item.quantity}шт.)`).join(', '), totalSum);
-        });
-    });
-
-    function finalizeOrder(name, productsText, total) {
-        const newOrder = {
-            id: Math.floor(Math.random() * 100000),
-            date: new Date().toLocaleString('ru-RU'),
-            products: productsText,
-            totalPrice: total
-        };
-
-        let history = JSON.parse(localStorage.getItem('shop_history')) || [];
-        history.unshift(newOrder);
-        localStorage.setItem('shop_history', JSON.stringify(history));
-
-        alert(`Заказ успешно оформлен!\nУведомление отправлено в Telegram.`);
-        
-        cart = [];
-        updateCartUI();
-        orderForm.reset();
-        progressContainer.style.display = 'none';
-        renderHistory();
     }
 
     function renderHistory() {
         const history = JSON.parse(localStorage.getItem('shop_history')) || [];
-
+        if (!historyList) return;
         if (history.length === 0) {
             historyEmpty.style.display = 'block';
             historyList.innerHTML = '';
@@ -208,23 +150,20 @@ const url = `https://telegram.org.ru{TG_BOT_TOKEN}/sendMessage`;
             const card = document.createElement('div');
             card.className = 'history-card';
             card.innerHTML = `
-                <div class="history-header">
-                    <span>Заказ №${order.id}</span>
-                    <span>${order.date}</span>
-                </div>
+                <div class="history-header"><span>Заказ №${order.id}</span><span>${order.date}</span></div>
                 <div><strong>Товары:</strong> ${order.products}</div>
-                <div style="margin-top: 0.5rem; text-align: right; font-weight: bold; color: #2ecc71;">
-                    Сумма: ${order.totalPrice.toLocaleString('ru-RU')} руб.
-                </div>
+                <div style="margin-top: 0.5rem; text-align: right; font-weight: bold; color: #2ecc71;">Сумма: ${order.totalPrice.toLocaleString('ru-RU')} руб.</div>
             `;
             historyList.appendChild(card);
         });
     }
 
-    clearHistoryBtn.addEventListener('click', () => {
-        if(confirm("Вы уверены, что хотите очистить всю историю заказов?")) {
-            localStorage.removeItem('shop_history');
-            renderHistory();
-        }
-    });
+    if (clearHistoryBtn) {
+        clearHistoryBtn.addEventListener('click', () => {
+            if(confirm("Очистить историю?")) {
+                localStorage.removeItem('shop_history');
+                renderHistory();
+            }
+        });
+    }
 });

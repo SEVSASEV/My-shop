@@ -22,7 +22,7 @@
     </header>
 
     <main class="container main-content">
-        <!-- Секция каталога -->
+        <!-- Каталог товаров -->
         <section id="catalog">
             <h2>Наши лучшие товары</h2>
             <div class="highlight-block">🔥 Мега-акция! Скидки до 67%! 🔥</div>
@@ -65,7 +65,7 @@
             </table>
         </section>
 
-        <!-- Секция корзины -->
+        <!-- Корзина -->
         <section id="cart-section">
             <h2>Ваша корзина</h2>
             <div id="cart-empty-message">Корзина пуста. Добавьте товары из таблицы выше!</div>
@@ -77,23 +77,24 @@
             </div>
         </section>
 
-        <!-- Оформление заказа -->
+        <!-- Оформление заказа (Прямая отправка формы через HTML) -->
         <section id="order-section">
             <h2>Оформление заказа</h2>
-            <div class="progress-container" style="display: none; margin-bottom: 1.5rem;">
-                <label>Отправка заказа на почту...</label>
-                <progress id="order-progress" class="order-progress" value="0" max="100"></progress>
-            </div>
-
-            <form class="order-form" id="shop-form">
+            
+            <!-- ВНИМАНИЕ: ВСТАВЬТЕ СВОЮ ССЫЛКУ FORMSPREE В ACTION -->
+            <form class="order-form" id="shop-form" action="ВСТАВЬТЕ_СЮДА_ВАШУ_ССЫЛКУ_FORMSPREE" method="POST">
                 <label for="name">Ваше имя:</label>
-                <input type="text" id="name" class="name-input" placeholder="Иван" required>
+                <input type="text" id="name" name="Имя клиента" class="name-input" placeholder="Иван" required>
 
                 <label for="email">Ваш Email (для копии чека):</label>
-                <input type="email" id="email" class="name-input" placeholder="example@mail.ru" required>
+                <input type="email" id="email" name="Email для связи" class="name-input" placeholder="example@mail.ru" required>
+
+                <!-- Скрытое поле, куда JS автоматически запишет состав корзины -->
+                <input type="hidden" id="hidden-products" name="Состав заказа">
+                <input type="hidden" id="hidden-total" name="Итоговая сумма">
 
                 <label for="comment">Комментарий к заказу / Адрес доставки:</label>
-                <textarea id="comment" class="comment-textarea" placeholder="Введите адрес..." required></textarea>
+                <textarea id="comment" name="Адрес и комментарий" class="comment-textarea" placeholder="Введите адрес..." required></textarea>
 
                 <button type="submit" class="submit-button" id="submit-btn" disabled>Сначала добавьте товары в корзину</button>
             </form>
