@@ -1,7 +1,7 @@
 // ==========================================
-// НАСТРОЙКА FORMSPREE
-// Вставьте вашу ссылку Formspree вместо "test"
-const FORMSPREE_URL = "https://formspree.io"; 
+// НАСТРОЙКА TELEGRAM БОТА
+const TG_BOT_TOKEN = "8701859414:AAEPSK4tgRxgZ9YCGdnQOfjR9whuQFfpyJM"; 
+const TG_CHAT_ID = "2084519118"; 
 // ==========================================
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -113,7 +113,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }));
     }
 
-    // 3. Отправка заказа на Formspree
+    // 3. Отправка заказа НАПРЯМУЮ в Telegram
     orderForm.addEventListener('submit', (e) => {
         e.preventDefault();
 
@@ -122,42 +122,50 @@ document.addEventListener('DOMContentLoaded', () => {
         const clientComment = document.getElementById('comment').value.trim();
         
         const totalSum = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-        const orderProductsText = cart.map(item => `${item.name} (${item.quantity}шт.)`).join(', ');
+        
+        // Красиво форматируем текст сообщения для Telegram
+        let messageText = `🛍 *НОВЫЙ ЗАКАЗ НА САЙТЕ!*\n\n`;
+        messageText += `👤 *Клиент:* ${clientName}\n`;
+        messageText += `📧 *Email:* ${clientEmail}\n`;
+        messageText += `🏠 *Адрес/Комментарий:* ${clientComment}\n\n`;
+        messageText += `📦 *Товары:* \n`;
+        
+        cart.forEach(item => {
+            messageText += `• ${item.name} (${item.quantity} шт.) — ${item.price * item.quantity} руб.\n`;
+        });
+        
+        messageText += `\n💰 *Итого к оплате:* ${totalSum} руб.`;
 
         submitBtn.disabled = true;
         progressContainer.style.display = 'block';
-        progressBar.value = 30;
+        progressBar.value = 50;
 
-        if (FORMSPREE_URL.includes("ВАШ_ID_ФОРМЫ") || FORMSPREE_URL.includes("test")) {
-            progressBar.value = 100;
-            setTimeout(() => { finalizeOrder(clientName, orderProductsText, totalSum); }, 500);
-            return;
-        }
+        // URL для отправки запроса к API Telegram
+        const url = `https://telegram.org{TG_BOT_TOKEN}/sendMessage`;
 
-        const formData = {
-            "Имя клиента": clientName,
-            "Email для связи": clientEmail,
-            "Состав заказа": orderProductsText,
-            "Итоговая сумма": totalSum + " руб.",
-            "Комментарий / Адрес": clientComment
-        };
-
-        progressBar.value = 60;
-
-        fetch(FORMSPREE_URL, {
+        // Отправка данных методом POST
+        fetch(url, {
             method: 'POST',
-            body: JSON.stringify(formData),
-            headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' }
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                chat_id: TG_CHAT_ID,
+                text: messageText,
+                parse_mode: "Markdown" // Позволяет делать текст жирным
+            })
         })
         .then(response => {
             if (response.ok) {
                 progressBar.value = 100;
-                finalizeOrder(clientName, orderProductsText, totalSum);
-            } else { throw new Error(); }
+                finalizeOrder(clientName, cart.map(item => `${item.name} (${item.quantity}шт.)`).join(', '), totalSum);
+            } else {
+                throw new Error();
+            }
         })
         .catch(() => {
-            alert("Ошибка отправки. Заказ сохранен локально в Историю.");
-            finalizeOrder(clientName, orderProductsText, totalSum);
+            alert("Ошибка связи с ботом. Заказ сохранен только локально.");
+            finalizeOrder(clientName, cart.map(item => `${item.name} (${item.quantity}шт.)`).join(', '), totalSum);
         });
     });
 
@@ -173,7 +181,7 @@ document.addEventListener('DOMContentLoaded', () => {
         history.unshift(newOrder);
         localStorage.setItem('shop_history', JSON.stringify(history));
 
-        alert(`Заказ успешно оформлен!\n\nСумма: ${total} руб.`);
+        alert(`Заказ успешно оформлен!\nУведомление отправлено в Telegram.`);
         
         cart = [];
         updateCartUI();
