@@ -20,74 +20,77 @@ const BASE_PRODUCTS = [
     { id: 12, name: "Консультация IT-специалиста", price: 3500, category: "services", img: "img/consult.jpg", description: "Часовая индивидуальная сессия с разработчиком.", specs: { "Длительность": "60 мин", "Платформа": "Zoom" } }
 ];
 
-// 2. Генератор дополнительных 90 товаров (Одежда, Игры, Игрушки)
+// 2. Генератор дополнительных 90 товаров со встроенными независимыми SVG-картинками
 const generateExtraProducts = () => {
     const extra = [];
     let currentId = 13;
 
-    // Шаблоны для генерации одежды
-    const clothingTypes = ["Худи", "Футболка", "Джинсы", "Кроссовки", "Куртка", "Свитшот", "Кепка", "Спортивные штаны", "Носки Premium", "Рюкзак"];
+    const clothingTypes = ["Худи Premium", "Футболка Streetwear", "Джинсы Slim", "Кроссовки Run", "Куртка Urban", "Свитшот Casual", "Кепка Sport", "Спортивные штаны", "Носки Cotton", "Рюкзак Tech"];
     const brands = ["Streetwear", "Спорт-Плюс", "Urban Style", "EcoCotton", "TechWear"];
     const colors = ["Черный", "Белый", "Оверсайз Серый", "Бежевый", "Темно-зеленый"];
 
-    // Шаблоны для генерации игр
     const gameGenres = ["RPG Quest", "Racing Simulator", "Action Shooter", "Strategy War", "Cyber Horror", "Survival Island", "Sports Football"];
     const platforms = ["PC / PlayStation 5", "Xbox Series X", "Nintendo Switch", "PC Digital"];
 
-    // Шаблоны для генерации игрушек
-    const toyTypes = ["Конструктор", "Плюшевый мишка", "Радиоуправляемая машина", "Настольная игра", "Коллекционная фигурка", "Пазл", "Развивающий набор"];
+    const toyTypes = ["Конструктор Блоки", "Плюшевый мишка", "Радиоуправляемая машина", "Настольная игра", "Коллекционная фигурка", "Пазл Сложный", "Развивающий набор"];
     const materials = ["Гипоаллергенный пластик", "Эко-дерево", "Мягкий плюш", "Плотный картон"];
 
-    // Генерируем 30 товаров Одежды
+    // Функция генерации графики в коде браузера
+    const createPlaceholderSvg = (text, bgColor) => {
+        const svg = `<svg xmlns="http://w3.org" width="400" height="300" viewBox="0 0 400 300">
+            <rect width="100%" height="100%" fill="${bgColor}"/>
+            <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="Segoe UI, sans-serif" font-size="20" font-weight="bold" fill="#ffffff">${text}</text>
+        </svg>`;
+        return "data:image/svg+xml;utf8," + encodeURIComponent(svg);
+    };
+
+    // Одежда (Фиолетовые фоны)
     for (let i = 1; i <= 30; i++) {
         const type = clothingTypes[i % clothingTypes.length];
         const brand = brands[i % brands.length];
-        const color = colors[i % colors.length];
         extra.push({
             id: currentId++,
             name: `${type} ${brand} #${i}`,
             price: 1200 + (i * 130),
             category: "clothes",
-            img: "img/clothes.jpg",
-            description: `Стильный элемент гардероба: ${type.toLowerCase()} от бренда ${brand}. Изготовлен из качественных дышащих материалов, подходит для повседневной носки.`,
-            specs: { "Материал": "80% Хлопок, 20% Полиэстер", "Цвет": color, "Стиль": "Casual / Стритвеар", "Размеры в наличии": "S, M, L, XL" }
+            img: createPlaceholderSvg(type, "#8e44ad"),
+            description: `Стильный элемент гардероба от бренда ${brand}. Изготовлен из качественных дышащих материалов.`,
+            specs: { "Материал": "Хлопок / Полиэстер", "Цвет": colors[i % colors.length], "Размеры": "S, M, L, XL" }
         });
     }
 
-    // Генерируем 30 товаров Игр
+    // Игры (Темно-синие фоны)
     for (let i = 1; i <= 30; i++) {
         const genre = gameGenres[i % gameGenres.length];
-        const platform = platforms[i % platforms.length];
         extra.push({
             id: currentId++,
             name: `Игра: ${genre} Часть ${i}`,
             price: 1990 + (i * 100),
             category: "games",
-            img: "img/games.jpg",
-            description: `Захватывающая видеоигра в жанре ${genre.toLowerCase()}. Отличная графика, проработанный сюжет и десятки часов увлекательного игрового процесса.`,
-            specs: { "Жанр": genre, "Платформа": platform, "Язык": "Русский / Английский", "Возрастной ценз": "16+" }
+            img: createPlaceholderSvg(`🎮 ${genre}`, "#2c3e50"),
+            description: `Захватывающая видеоигра в жанре ${genre.toLowerCase()}. Отличная графика и сюжет.`,
+            specs: { "Жанр": genre, "Платформа": platforms[i % platforms.length], "Язык": "Русский" }
         });
     }
 
-    // Генерируем 30 товаров Игрушек
+    // Игрушки (Оранжевые фоны)
     for (let i = 1; i <= 30; i++) {
         const type = toyTypes[i % toyTypes.length];
-        const material = materials[i % materials.length];
         extra.push({
             id: currentId++,
             name: `${type} "${i}-й Век"`,
             price: 800 + (i * 90),
             category: "toys",
-            img: "img/toys.jpg",
-            description: `Прекрасный выбор для подарка: ${type.toLowerCase()}. Развивает мелкую моторику, логическое мышление, воображение и гарантирует веселое времяпрепровождение.`,
-            specs: { "Тип товара": type, "Материал": material, "Возраст": "от 3-х лет", "Безопасность": "Сертифицировано" }
+            img: createPlaceholderSvg(`🧸 ${type}`, "#d35400"),
+            description: `Прекрасный развивающий выбор для подарка: ${type.toLowerCase()}.`,
+            specs: { "Тип": type, "Материал": materials[i % materials.length], "Возраст": "от 3-х лет" }
         });
     }
 
     return extra;
 };
 
-// Объединяем базовые и сгенерированные товары в единую базу из 102 позиций
+// Объединяем в единую базу
 const PRODUCTS_DATABASE = [...BASE_PRODUCTS, ...generateExtraProducts()];
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -127,12 +130,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const modalSpecsList = document.getElementById('modal-specs-list');
     const modalBuyBtn = document.getElementById('modal-buy-btn');
 
-    // Инициализация сайта
+    // Инициализация
     renderProducts(PRODUCTS_DATABASE);
     renderHistory();
 
-    // 1. Отрисовка карточек с автоматической задержкой анимации (--delay)
+    // 3. Отрисовка каталога
     function renderProducts(products) {
+        if (!productsGrid) return;
         productsGrid.innerHTML = '';
         if(products.length === 0) {
             productsGrid.innerHTML = '<p style="grid-column: 1/-1; text-align:center; color:#7f8c8d;">Товары не найдены</p>';
@@ -142,8 +146,7 @@ document.addEventListener('DOMContentLoaded', () => {
         products.forEach((prod, index) => {
             const card = document.createElement('div');
             card.className = 'product-card animate-card';
-            // Передаем индекс для красивой поочередной анимации появления
-            card.style.setProperty('--delay', index); 
+            card.style.setProperty('--delay', index % 10); // Ограничиваем задержку для скорости
             
             card.innerHTML = `
                 <img src="${prod.img}" alt="${prod.name}" class="view-details-trigger" data-id="${prod.id}" style="cursor:pointer;">
@@ -159,10 +162,9 @@ document.addEventListener('DOMContentLoaded', () => {
             productsGrid.appendChild(card);
         });
 
-        // Слушатели кликов для добавления в корзину
+        // Навешивание событий на новые кнопки
         productsGrid.querySelectorAll('.buy-button').forEach(btn => {
             btn.addEventListener('click', (e) => {
-                e.stopPropagation();
                 const pId = parseInt(btn.getAttribute('data-id'));
                 const product = PRODUCTS_DATABASE.find(p => p.id === pId);
                 addToCart(product);
@@ -173,24 +175,22 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
 
-        // Слушатели кликов для открытия модального окна (при клике на картинку, текст или кнопку "Инфо")
-        const openModalElements = productsGrid.querySelectorAll('.view-details-trigger, .details-button');
-        openModalElements.forEach(element => {
-            element.addEventListener('click', (e) => {
-                const pId = parseInt(element.getAttribute('data-id'));
+        productsGrid.querySelectorAll('.view-details-trigger, .details-button').forEach(el => {
+            el.addEventListener('click', () => {
+                const pId = parseInt(el.getAttribute('data-id'));
                 const product = PRODUCTS_DATABASE.find(p => p.id === pId);
                 openProductModal(product);
             });
         });
     }
 
-    // 2. Логика работы модального окна подробной информации
+    // 4. Логика модального окна
     function openProductModal(product) {
+        if (!modal) return;
         modalImg.src = product.img;
         modalTitle.textContent = product.name;
         modalDesc.textContent = product.description;
         
-        // Очищаем и заполняем список технических характеристик
         modalSpecsList.innerHTML = '';
         for (const [key, value] of Object.entries(product.specs)) {
             const li = document.createElement('li');
@@ -198,32 +198,29 @@ document.addEventListener('DOMContentLoaded', () => {
             modalSpecsList.appendChild(li);
         }
 
-        // Привязываем ID товара к кнопке покупки внутри модалки
         modalBuyBtn.setAttribute('data-id', product.id);
-        
-        // Показываем окно
-        modal.style.display = 'block';
-        document.body.style.overflow = 'hidden'; // Запрещаем прокрутку фона
+        modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
     }
 
-    // Закрытие модального окна
-    function closeModal() {
-        modal.style.display = 'none';
-        document.body.style.overflow = 'auto'; // Возвращаем прокрутку
+    if (modalClose) {
+        modalClose.addEventListener('click', () => {
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        });
     }
 
-    modalClose.addEventListener('click', closeModal);
-    window.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+    if (modalBuyBtn) {
+        modalBuyBtn.addEventListener('click', () => {
+            const pId = parseInt(modalBuyBtn.getAttribute('data-id'));
+            const product = PRODUCTS_DATABASE.find(p => p.id === pId);
+            addToCart(product);
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        });
+    }
 
-    // Покупка из модального окна
-    modalBuyBtn.addEventListener('click', () => {
-        const pId = parseInt(modalBuyBtn.getAttribute('data-id'));
-        const product = PRODUCTS_DATABASE.find(p => p.id === pId);
-        addToCart(product);
-        closeModal();
-    });
-
-    // 3. Живой поиск и фильтрация каталога
+    // 5. Поиск и фильтры
     function filterCatalog() {
         const searchText = searchInput.value.toLowerCase().trim();
         const selectedCat = categoryFilter.value;
@@ -237,10 +234,10 @@ document.addEventListener('DOMContentLoaded', () => {
         renderProducts(filtered);
     }
 
-    searchInput.addEventListener('input', filterCatalog);
-    categoryFilter.addEventListener('change', filterCatalog);
+    if (searchInput) searchInput.addEventListener('input', filterCatalog);
+    if (categoryFilter) categoryFilter.addEventListener('change', filterCatalog);
 
-    // 4. Логика корзины покупок
+    // 6. Управление корзиной
     function addToCart(product) {
         const existingItem = cart.find(item => item.id === product.id);
         if (existingItem) {
@@ -252,6 +249,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function updateCartUI() {
+        if (!cartCount) return;
         const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
         cartCount.textContent = totalItems;
 
@@ -297,88 +295,94 @@ document.addEventListener('DOMContentLoaded', () => {
 
         totalSumEl.textContent = Math.round(totalSum).toLocaleString('ru-RU');
 
-        // Кнопки "+" / "-" / "Удалить" внутри корзины
         cartItemsList.querySelectorAll('.plus').forEach(btn => btn.addEventListener('click', (e) => {
             cart[e.target.getAttribute('data-index')].quantity += 1;
             updateCartUI();
         }));
 
-        cartItemsList.querySelectorAll('.minus').forEach(btn => btn.addEventListener('click', (e) => {
-            const idx = e.target.getAttribute('data-index');
-            if (cart[idx].quantity > 1) cart[idx].quantity -= 1;
-            else cart.splice(idx, 1);
-            updateCartUI();
-        }));
+        cartItemsList.querySelectorAll('.minus').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const idx = e.target.getAttribute('data-index');
+                if (cart[idx].quantity > 1) cart[idx].quantity -= 1;
+                else cart.splice(idx, 1);
+                updateCartUI();
+            });
+        });
 
-        cartItemsList.querySelectorAll('.delete-btn').forEach(btn => btn.addEventListener('click', (e) => {
-            cart.splice(e.target.getAttribute('data-index'), 1);
-            updateCartUI();
-        }));
+        cartItemsList.querySelectorAll('.delete-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                cart.splice(e.target.getAttribute('data-index'), 1);
+                updateCartUI();
+            });
+        });
     }
 
-    // 5. Логика купона/промокода
-    applyPromoBtn.addEventListener('click', () => {
-        const code = promoInput.value.trim().toUpperCase();
-        if (code === "SALE10") {
-            isDiscountApplied = true;
-            alert("Промокод применен! Скидка 10% успешно активирована.");
-            updateCartUI();
-        } else {
-            alert("Неверный промокод!");
-        }
-        promoInput.value = '';
-    });
-
-    // 6. Отправка писем на Formspree
-    orderForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-
-        const clientName = document.getElementById('name').value.trim();
-        const clientEmail = document.getElementById('email').value.trim();
-        const clientComment = document.getElementById('comment').value.trim();
-        
-        let totalSum = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-        if (isDiscountApplied) totalSum = totalSum * 0.9;
-
-        const orderProductsText = cart.map(item => `${item.name} (${item.quantity}шт.)`).join(', ');
-
-        submitBtn.disabled = true;
-        progressContainer.style.display = 'block';
-        progressBar.value = 30;
-
-        if (FORMSPREE_URL.includes("ВАШ_ID_ФОРМЫ")) {
-            progressBar.value = 100;
-            setTimeout(() => { finalizeOrder(clientName, orderProductsText, totalSum); }, 500);
-            return;
-        }
-
-        const formData = {
-            "Имя клиента": clientName,
-            "Email для связи": clientEmail,
-            "Состав заказа": orderProductsText,
-            "Итоговая сумма со скидкой": Math.round(totalSum) + " руб.",
-            "Промокод": isDiscountApplied ? "Применен (SALE10)" : "Не использован",
-            "Комментарий / Адрес": clientComment
-        };
-
-        progressBar.value = 60;
-
-        fetch(FORMSPREE_URL, {
-            method: 'POST',
-            body: JSON.stringify(formData),
-            headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' }
-        })
-        .then(response => {
-            if (response.ok) {
-                progressBar.value = 100;
-                finalizeOrder(clientName, orderProductsText, totalSum);
-            } else { throw new Error(); }
-        })
-        .catch(() => {
-            alert("Ошибка сети при отправке. Заказ сохранен локально в вашей вкладке Истории.");
-            finalizeOrder(clientName, orderProductsText, totalSum);
+    // Промокод
+    if (applyPromoBtn) {
+        applyPromoBtn.addEventListener('click', () => {
+            if (promoInput.value.trim().toUpperCase() === "SALE10") {
+                isDiscountApplied = true;
+                alert("Скидка 10% активирована!");
+                updateCartUI();
+            } else {
+                alert("Неверный промокод!");
+            }
+            promoInput.value = '';
         });
-    });
+    }
+
+    // 7. Отправка формы на Formspree
+    if (orderForm) {
+        orderForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const clientName = document.getElementById('name').value.trim();
+            const clientEmail = document.getElementById('email').value.trim();
+            const clientComment = document.getElementById('comment').value.trim();
+            
+            let totalSum = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            if (isDiscountApplied) totalSum = totalSum * 0.9;
+
+            const orderProductsText = cart.map(item => `${item.name} (${item.quantity}шт.)`).join(', ');
+
+            submitBtn.disabled = true;
+            progressContainer.style.display = 'block';
+            progressBar.value = 30;
+
+            if (FORMSPREE_URL.includes("ВАШ_ID_ФОРМЫ")) {
+                progressBar.value = 100;
+                setTimeout(() => { finalizeOrder(clientName, orderProductsText, totalSum); }, 500);
+                return;
+            }
+
+            const formData = {
+                "Имя клиента": clientName,
+                "Email для связи": clientEmail,
+                "Состав заказа": orderProductsText,
+                "Итоговая сумма": Math.round(totalSum) + " руб.",
+                "Промокод": isDiscountApplied ? "SALE10" : "Нет",
+                "Адрес доставки": clientComment
+            };
+
+            progressBar.value = 60;
+
+            fetch(FORMSPREE_URL, {
+                method: 'POST',
+                body: JSON.stringify(formData),
+                headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' }
+            })
+            .then(res => {
+                if (res.ok) {
+                    progressBar.value = 100;
+                    finalizeOrder(clientName, orderProductsText, totalSum);
+                } else { throw new Error(); }
+            })
+            .catch(() => {
+                alert("Ошибка отправки. Заказ сохранен локально.");
+                finalizeOrder(clientName, orderProductsText, totalSum);
+            });
+        });
+    }
 
     function finalizeOrder(name, productsText, total) {
         const newOrder = {
@@ -392,7 +396,7 @@ document.addEventListener('DOMContentLoaded', () => {
         history.unshift(newOrder);
         localStorage.setItem('shop_history', JSON.stringify(history));
 
-        alert(`Успешно!\n\nЗаказ оформлен.\nДанные отправлены на почту администратора.`);
+        alert(`Заказ оформлен!\nСумма: ${Math.round(total)} руб.`);
         
         cart = [];
         isDiscountApplied = false;
@@ -402,8 +406,9 @@ document.addEventListener('DOMContentLoaded', () => {
         renderHistory();
     }
 
-    // 7. Отрисовка истории покупок
+    // 8. История
     function renderHistory() {
+        if (!historyList) return;
         const history = JSON.parse(localStorage.getItem('shop_history')) || [];
         if (history.length === 0) {
             historyEmpty.style.display = 'block';
@@ -420,23 +425,20 @@ document.addEventListener('DOMContentLoaded', () => {
             const card = document.createElement('div');
             card.className = 'history-card';
             card.innerHTML = `
-                <div class="history-header">
-                    <span>Заказ №${order.id}</span>
-                    <span>${order.date}</span>
-                </div>
+                <div class="history-header"><span>Заказ №${order.id}</span><span>${order.date}</span></div>
                 <div><strong>Товары:</strong> ${order.products}</div>
-                <div style="margin-top: 0.5rem; text-align: right; font-weight: bold; color: #2ecc71;">
-                    Сумма: ${order.totalPrice.toLocaleString('ru-RU')} руб.
-                </div>
+                <div style="margin-top:0.5rem; text-align:right; font-weight:bold; color:#2ecc71;">Сумма: ${order.totalPrice} руб.</div>
             `;
             historyList.appendChild(card);
         });
     }
 
-    clearHistoryBtn.addEventListener('click', () => {
-        if(confirm("Вы уверены, что хотите очистить всю историю заказов?")) {
-            localStorage.removeItem('shop_history');
-            renderHistory();
-        }
-    });
+    if (clearHistoryBtn) {
+        clearHistoryBtn.addEventListener('click', () => {
+            if(confirm("Очистить историю?")) {
+                localStorage.removeItem('shop_history');
+                renderHistory();
+            }
+        });
+    }
 });
