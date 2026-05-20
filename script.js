@@ -4,121 +4,62 @@
 const FORMSPREE_URL = "https://formspree.io/f/mrededyy"; 
 // ==========================================
 
-// Функция генерации графических карточек прямо в браузере (Data URL)
-// Исключает ошибки CORS, ERR_FILE_NOT_FOUND и не требует наличия папки img
+// Функция генерации графических обложек прямо в браузере (Data URL)
 const createPlaceholderSvg = (text, categoryText, bgColor) => {
     const svg = `<svg xmlns="http://w3.org" width="400" height="300" viewBox="0 0 400 300">
         <rect width="100%" height="100%" fill="${bgColor}"/>
-        <!-- Декоративный полупрозрачный круг на фоне -->
         <circle cx="300" cy="220" r="100" fill="#ffffff" opacity="0.1"/>
-        <circle cx="80" cy="60" r="50" fill="#ffffff" opacity="0.05"/>
-        <!-- Категория товара мелким шрифтом -->
         <text x="30" y="50" font-family="Segoe UI, sans-serif" font-size="14" font-weight="600" fill="#ffffff" opacity="0.7" letter-spacing="1">${categoryText.toUpperCase()}</text>
-        <!-- Название конкретного товара по центру -->
         <text x="30" y="160" font-family="Segoe UI, sans-serif" font-size="24" font-weight="bold" fill="#ffffff">${text}</text>
-        <!-- Декоративная линия -->
         <line x1="30" y1="185" x2="100" y2="185" stroke="#ffffff" stroke-width="4" stroke-linecap="round" opacity="0.9"/>
     </svg>`;
     return "data:image/svg+xml;utf8," + encodeURIComponent(svg);
 };
 
-// 1. Ваши базовые товары (12 шт) с автогенерируемыми картинками, чтобы не зависеть от локальных файлов
-const BASE_PRODUCTS = [
-    { id: 1, name: "Наушники Premium", price: 3000, category: "gadgets", img: createPlaceholderSvg("Наушники Bass+", "Гаджеты", "#34495e"), description: "Полноразмерные беспроводные наушники с глубоким басом.", specs: { "Время работы": "до 40 часов", "Цвет": "Черный" } },
-    { id: 2, name: "Подписка Telegram Premium", price: 2000, category: "services", img: createPlaceholderSvg("Telegram Premium", "Услуги", "#0088cc"), description: "Официальная подписка на 12 месяцев.", specs: { "Срок действия": "12 месяцев", "Тип": "Gift" } },
-    { id: 3, name: "Чайник Electric", price: 1500, category: "appliances", img: createPlaceholderSvg("Стальной Чайник", "Техника", "#7f8c8d"), description: "Стильный электрический чайник из стали.", specs: { "Объем": "1.7 л", "Мощность": "2200 Вт" } },
-    { id: 4, name: "iPhone 15 Pro Max Super", price: 45000, category: "gadgets", img: createPlaceholderSvg("iPhone 15 Pro", "Гаджеты", "#2c3e50"), description: "Флагманский smartphone в титановом корпусе.", specs: { "Экран": "6.7 дюйма", "Память": "256 ГБ" } },
-    { id: 5, name: "Умные часы Sport Watch", price: 5500, category: "gadgets", img: createPlaceholderSvg("Sport Watch v2", "Гаджеты", "#16a085"), description: "Современные смарт-часы с AMOLED-экраном.", specs: { "Экран": "1.43 дюйма", "Автономность": "14 дней" } },
-    { id: 6, name: "Робот-пылесос CleanBot", price: 14000, category: "appliances", img: createPlaceholderSvg("Робот CleanBot", "Техника", "#2980b9"), description: "Робот-пылесос для сухой и влажной уборки.", specs: { "Мощность": "4000 Па", "Навигация": "LiDAR" } },
-    { id: 7, name: "Капсульная кофемашина", price: 8900, category: "appliances", img: createPlaceholderSvg("Кофемашина", "Техника", "#c0392b"), description: "Компактная кофемашина для быстрого эспрессо.", specs: { "Давление": "19 бар", "Объем": "0.8 л" } },
-    { id: 8, name: "Игровая приставка NextGen", price: 52000, category: "gadgets", img: createPlaceholderSvg("NextGen Console", "Гаджеты", "#272727"), description: "Игровая консоль нового поколения с поддержкой 4K.", specs: { "Накопитель": "1 ТБ SSD", "Разрешение": "4K UHD" } },
-    { id: 9, name: "Курс по веб-разработке PRO", price: 15000, category: "services", img: createPlaceholderSvg("Курс Web-PRO", "Услуги", "#8e44ad"), description: "Полный онлайн-курс по созданию сайтов с нуля.", specs: { "Формат": "Практика", "Длительность": "6 месяцев" } },
-    { id: 10, name: "Вертикальный отпариватель", price: 4200, category: "appliances", img: createPlaceholderSvg("Отпариватель", "Техника", "#d35400"), description: "Мощный ручной отпариватель для одежды.", specs: { "Подача пара": "30 г/мин", "Мощность": "1600 Вт" } },
-    { id: 11, name: "Портативная колонка Boom", price: 2500, category: "gadgets", img: createPlaceholderSvg("Колонка Boom", "Гаджеты", "#d35400"), description: "Беспроводная колонка с защитой от воды IPX7.", specs: { "Мощность": "20 Вт", "Автономность": "12 часов" } },
-    { id: 12, name: "Консультация IT-специалиста", price: 3500, category: "services", img: createPlaceholderSvg("IT Консультация", "Услуги", "#2c3e50"), description: "Часовая индивидуальная сессия с разработчиком.", specs: { "Длительность": "60 мин", "Платформа": "Zoom" } }
+// База данных строго из 4 основных товаров
+const PRODUCTS_DATABASE = [
+    { 
+        id: 1, 
+        name: "Наушники", 
+        price: 3000, 
+        category: "gadgets", 
+        img: createPlaceholderSvg("Наушники Bass+", "Гаджеты", "#34495e"), 
+        description: "Полноразмерные беспроводные наушники с глубоким басом и активным шумоподавлением. Идеально подходят для путешествий, работы в офисе и занятий спортом.", 
+        specs: { "Время работы": "до 40 часов", "Цвет": "Черный", "Подключение": "Bluetooth 5.2" } 
+    },
+    { 
+        id: 2, 
+        name: "Подписка Telegram Premium", 
+        price: 2000, 
+        category: "services", 
+        img: createPlaceholderSvg("Telegram Premium", "Услуги", "#0088cc"), 
+        description: "Официальная подписка на 12 месяцев. Открывает доступ к эксклюзивным функциям, удвоенным лимитам и уникальным стикерам.", 
+        specs: { "Срок действия": "12 месяцев", "Тип": "Gift", "Скорость": "Максимальная" } 
+    },
+    { 
+        id: 3, 
+        name: "Чайник", 
+        price: 1500, 
+        category: "appliances", 
+        img: createPlaceholderSvg("Стальной Чайник", "Техника", "#7f8c8d"), 
+        description: "Стильный электрический чайник из нержавеющей стали с функцией выбора температуры и защиты от включения без воды.", 
+        specs: { "Объем": "1.7 л", "Мощность": "2200 Вт", "Материал": "Сталь" } 
+    },
+    { 
+        id: 4, 
+        name: "iPhone 15 Pro Max Super", 
+        price: 45000, 
+        category: "gadgets", 
+        img: createPlaceholderSvg("iPhone 15 Pro", "Гаджеты", "#2c3e50"), 
+        description: "Флагманский смартфон в титановом корпусе. Оснащен мощнейшим процессором A17 Pro и передовой системой камер.", 
+        specs: { "Экран": "6.7 дюйма", "Память": "256 ГБ", "Корпус": "Титан" } 
+    }
 ];
-
-// 2. Генератор дополнительных 90 товаров (Каждый получает уникальный сгенерированный рисунок)
-const generateExtraProducts = () => {
-    const extra = [];
-    let currentId = 13;
-
-    const clothingTypes = ["Худи Premium", "Футболка Streetwear", "Джинсы Slim", "Кроссовки Run", "Куртка Urban", "Свитшот Casual", "Кепка Sport", "Спортивные штаны", "Носки Cotton", "Рюкзак Tech"];
-    const brands = ["Streetwear", "Спорт-Плюс", "Urban Style", "EcoCotton", "TechWear"];
-    const colors = ["Черный", "Белый", "Оверсайз Серый", "Бежевый", "Темно-зеленый"];
-
-    const gameGenres = ["RPG Quest", "Racing Simulator", "Action Shooter", "Strategy War", "Cyber Horror", "Survival Island", "Sports Football"];
-    const platforms = ["PC / PlayStation 5", "Xbox Series X", "Nintendo Switch", "PC Digital"];
-
-    const toyTypes = ["Конструктор Блоки", "Плюшевый мишка", "Радиоуправляемая машина", "Настольная игра", "Коллекционная фигурка", "Пазл Сложный", "Развивающий набор"];
-    const materials = ["Гипоаллергенный пластик", "Эко-дерево", "Мягкий плюш", "Плотный картон"];
-
-    // Палитры цветов для категорий
-    const clothesColors = ["#4a148c", "#6a1b9a", "#7b1fa2", "#8e24aa", "#9c27b0"];
-    const gamesColors = ["#0d47a1", "#1565c0", "#1976d2", "#1e88e5", "#2196f3"];
-    const toysColors = ["#e65100", "#ef6c00", "#f57c00", "#fb8c00", "#ff9800"];
-
-    // Одежда (30 товаров)
-    for (let i = 1; i <= 30; i++) {
-        const type = clothingTypes[i % clothingTypes.length];
-        const brand = brands[i % brands.length];
-        const colorName = `${type} #${i}`;
-        const colorHex = clothesColors[i % clothesColors.length];
-
-        extra.push({
-            id: currentId++,
-            name: `${type} ${brand} #${i}`,
-            price: 1200 + (i * 130),
-            category: "clothes",
-            img: createPlaceholderSvg(colorName, "👔 Одежда и обувь", colorHex),
-            description: `Стильный элемент гардероба от бренда ${brand}. Изготовлен из качественных дышащих материалов.`,
-            specs: { "Материал": "Хлопок / Полиэстер", "Цвет": colors[i % colors.length], "Размеры": "S, M, L, XL" }
-        });
-    }
-
-    // Игры (30 товаров)
-    for (let i = 1; i <= 30; i++) {
-        const genre = gameGenres[i % gameGenres.length];
-        const colorHex = gamesColors[i % gamesColors.length];
-
-        extra.push({
-            id: currentId++,
-            name: `Игра: ${genre} Часть ${i}`,
-            price: 1990 + (i * 100),
-            category: "games",
-            img: createPlaceholderSvg(`Gamer Edition ${i}`, "🎮 Видеоигры", colorHex),
-            description: `Захватывающая видеоигра в жанре ${genre.toLowerCase()}. Отличная графика и сюжет.`,
-            specs: { "Жанр": genre, "Платформа": platforms[i % platforms.length], "Язык": "Русский" }
-        });
-    }
-
-    // Игрушки (30 товаров)
-    for (let i = 1; i <= 30; i++) {
-        const type = toyTypes[i % toyTypes.length];
-        const colorHex = toysColors[i % toysColors.length];
-
-        extra.push({
-            id: currentId++,
-            name: `${type} "${i}-й Век"`,
-            price: 800 + (i * 90),
-            category: "toys",
-            img: createPlaceholderSvg(type, "🧸 Игрушки / Хобби", colorHex),
-            description: `Прекрасный развивающий выбор для подарка: ${type.toLowerCase()}.`,
-            specs: { "Тип": type, "Материал": materials[i % materials.length], "Возраст": "от 3-х лет" }
-        });
-    }
-
-    return extra;
-};
-
-// Объединяем в единую базу (Итого 102 товара)
-const PRODUCTS_DATABASE = [...BASE_PRODUCTS, ...generateExtraProducts()];
 
 document.addEventListener('DOMContentLoaded', () => {
     let cart = [];
     let isDiscountApplied = false;
     
-    // Элементы DOM
     const productsGrid = document.getElementById('products-grid');
     const searchInput = document.getElementById('search-input');
     const categoryFilter = document.getElementById('category-filter');
@@ -142,7 +83,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const historyList = document.getElementById('history-list');
     const clearHistoryBtn = document.getElementById('clear-history-btn');
 
-    // Элементы Модального Окна
     const modal = document.getElementById('product-modal');
     const modalClose = document.getElementById('modal-close');
     const modalImg = document.getElementById('modal-img');
@@ -151,11 +91,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const modalSpecsList = document.getElementById('modal-specs-list');
     const modalBuyBtn = document.getElementById('modal-buy-btn');
 
-    // Инициализация
     renderProducts(PRODUCTS_DATABASE);
     renderHistory();
 
-    // Отрисовка каталога
     function renderProducts(products) {
         if (!productsGrid) return;
         productsGrid.innerHTML = '';
@@ -167,7 +105,7 @@ document.addEventListener('DOMContentLoaded', () => {
         products.forEach((prod, index) => {
             const card = document.createElement('div');
             card.className = 'product-card animate-card';
-            card.style.setProperty('--delay', index % 10);
+            card.style.setProperty('--delay', index);
             
             card.innerHTML = `
                 <img src="${prod.img}" alt="${prod.name}" class="view-details-trigger" data-id="${prod.id}" style="cursor:pointer;">
@@ -183,7 +121,6 @@ document.addEventListener('DOMContentLoaded', () => {
             productsGrid.appendChild(card);
         });
 
-        // Кнопки добавления
         productsGrid.querySelectorAll('.buy-button').forEach(btn => {
             btn.addEventListener('click', () => {
                 const pId = parseInt(btn.getAttribute('data-id'));
@@ -196,7 +133,6 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
 
-        // Клики для модалки
         productsGrid.querySelectorAll('.view-details-trigger, .details-button').forEach(el => {
             el.addEventListener('click', () => {
                 const pId = parseInt(el.getAttribute('data-id'));
@@ -206,7 +142,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Модальное окно
     function openProductModal(product) {
         if (!modal) return;
         modalImg.src = product.img;
@@ -242,7 +177,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Поиск и фильтры
     function filterCatalog() {
         const searchText = searchInput.value.toLowerCase().trim();
         const selectedCat = categoryFilter.value;
@@ -259,7 +193,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (searchInput) searchInput.addEventListener('input', filterCatalog);
     if (categoryFilter) categoryFilter.addEventListener('change', filterCatalog);
 
-    // Корзина
     function addToCart(product) {
         const existingItem = cart.find(item => item.id === product.id);
         if (existingItem) {
@@ -339,7 +272,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Промокод
     if (applyPromoBtn) {
         applyPromoBtn.addEventListener('click', () => {
             if (promoInput.value.trim().toUpperCase() === "SALE10") {
@@ -353,7 +285,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Отправка формы
     if (orderForm) {
         orderForm.addEventListener('submit', (e) => {
             e.preventDefault();
@@ -428,7 +359,6 @@ document.addEventListener('DOMContentLoaded', () => {
         renderHistory();
     }
 
-    // История
     function renderHistory() {
         if (!historyList) return;
         const history = JSON.parse(localStorage.getItem('shop_history')) || [];
